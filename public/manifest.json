@@ -1,6 +1,6 @@
 {
-  "short_name": "livekit-egress-web",
-  "name": "Web template for LiveKit Egress",
+  "short_name": "Gopaddi Recording Template",
+  "name": "gopaddi-recording-template",
   "icons": [
     {
       "src": "favicon.ico",

@@ -1,34 +1,28 @@
-/**
- * Copyright 2023 LiveKit, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import '@livekit/components-styles';
-import '@livekit/components-styles/prefabs';
 import EgressHelper from '@livekit/egress-sdk';
+import { LiveKitRoom } from '@livekit/components-react';
+import { useState } from 'react';
+
+import { CompositeTemplate } from './Room';
 import './App.css';
-import RoomPage from './Room';
 
 function App() {
+  const url = EgressHelper.getLiveKitURL();
+  const token = EgressHelper.getAccessToken();
+  const [error, setError] = useState<Error>();
+  
   return (
     <div className="container">
-      <RoomPage
-        // EgressHelper retrieves parameters passed to the page
-        url={EgressHelper.getLiveKitURL()}
-        token={EgressHelper.getAccessToken()}
-        layout={EgressHelper.getLayout()}
-      />
+      <div className="header">
+        <img src="/logo.svg" alt="Logo" />
+        <p>Gopaddi</p>
+      </div>
+      {!url || !token && <div className="error">missing required params url and token</div>}
+      <div className="content">
+        <LiveKitRoom serverUrl={url} token={token} onError={setError}>
+          {error ? <div className="error">{error.message}</div> : <CompositeTemplate />}
+        </LiveKitRoom>
+      </div>
     </div>
   );
 }

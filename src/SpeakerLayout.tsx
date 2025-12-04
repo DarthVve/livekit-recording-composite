@@ -38,10 +38,10 @@ const SpeakerLayout = ({ tracks: references }: LayoutProps) => {
 
   return (
     <div className="lk-focus-layout">
+      <FocusLayout trackRef={mainTrack as TrackReference} />
       <CarouselLayout tracks={remainingTracks}>
         <ParticipantTile />
       </CarouselLayout>
-      <FocusLayout trackRef={mainTrack as TrackReference} />
     </div>
   );
 };
