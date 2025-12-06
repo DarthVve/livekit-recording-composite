@@ -1,13 +1,11 @@
 import {
-  GridLayout,
-  ParticipantTile,
   RoomAudioRenderer,
   useRoomContext,
 } from '@livekit/components-react';
 import { ConnectionState } from 'livekit-client';
 import { ReactElement } from 'react';
-import SpeakerLayout from './SpeakerLayout';
 import useRecording from './useRecording';
+import { AudioOnlyLayout } from './CompositeLayout';
 
 export function CompositeTemplate() {
   const room = useRoomContext();
@@ -17,12 +15,10 @@ export function CompositeTemplate() {
   let main: ReactElement = <></>;
   if (room.state !== ConnectionState.Disconnected) {
     if (!isAudioOnly) {
-      main = <SpeakerLayout tracks={remoteVideoTracks} />;
+      main = <AudioOnlyLayout tracks={remoteVideoTracks} />
     } else {
       main = (
-        <GridLayout tracks={remoteVideoTracks}>
-          <ParticipantTile />
-        </GridLayout>
+        <AudioOnlyLayout tracks={remoteVideoTracks} />
       );
     }
   }

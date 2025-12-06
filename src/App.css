@@ -53,11 +53,9 @@ body {
 }
 
 .content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   background: url('/call-background.jpg') no-repeat center center;
   background-size: cover;
   color: #fff;
   height: 100%;
+  width: 100%;
 }
