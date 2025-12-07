@@ -30,11 +30,14 @@ export const AudioOnlyLayout = ({ tracks }: { tracks: TrackReference[] }) => {
   };
   
   const gridColumns = getOptimalColumns(participantCount);
+  const useFlex = participantCount < 5;
   
   return (
     <div 
-      className="audio-composite"
-      style={{ '--grid-columns': gridColumns } as React.CSSProperties}
+      className={`audio-composite ${useFlex ? 'audio-composite-flex' : 'audio-composite-grid'}`}
+      style={{ 
+        '--grid-columns': gridColumns
+      } as React.CSSProperties}
     >
       {remoteParticipants.map((participant, index) => (
         <div className='p-tile' key={index}>

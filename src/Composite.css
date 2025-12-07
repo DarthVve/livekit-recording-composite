@@ -5,13 +5,26 @@
 
 .audio-composite {
     position: relative;
-    display: grid;
-    grid-template-columns: repeat(var(--grid-columns, 1), 1fr);
-    gap: 2.5rem;
     padding: 0.5rem;
     height: 100%;
     width: 100%;
     overflow-y: auto;
+}
+
+/* Flex layout for less than 5 participants */
+.audio-composite-flex {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Grid layout for 5 or more participants */
+.audio-composite-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-columns, 1), 1fr);
+    gap: 2.5rem;
     align-content: center;
     justify-content: center;
     place-items: center;
