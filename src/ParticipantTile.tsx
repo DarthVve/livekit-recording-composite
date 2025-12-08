@@ -7,8 +7,6 @@ import './Composite.css';
 
 interface ParticipantTileProps {
     participant: Participant;
-    showMenu?: boolean;
-    showHandRaise?: boolean;
     tracks: TrackReference[];
 }
 
