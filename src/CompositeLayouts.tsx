@@ -4,7 +4,7 @@ import {
   useParticipants,
   useRoomContext,
 } from '@livekit/components-react';
-import { ParticipantTile, ParticipantTileWide } from './ParticipantTile';
+import { ParticipantTile, ParticipantTileWide } from './ParticipantTiles';
 import './Composite.css'
 
 export const AudioOnlyLayout = ({ tracks }: { tracks: TrackReference[] }) => {
