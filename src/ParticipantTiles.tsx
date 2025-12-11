@@ -5,15 +5,39 @@ import { ParticipantMetadata, useParticipantMetadata } from "vg-x07df";
 import { TrackReference } from "@livekit/components-core";
 import './Composite.css';
 
+// Size-specific classes configuration
+const SIZE_CLASSES = {
+    small: {
+        avatar: "participant-tile-avatar-small",
+        iconSize: 12,
+        initialsText: "participant-tile-initials-small",
+        nameText: "participant-tile-name-small"
+    },
+    medium: {
+        avatar: "participant-tile-avatar-medium",
+        iconSize: 16,
+        initialsText: "participant-tile-initials-medium",
+        nameText: "participant-tile-name-medium"
+    },
+    large: {
+        avatar: "participant-tile-avatar-large",
+        iconSize: 24,
+        initialsText: "participant-tile-initials-large",
+        nameText: "participant-tile-name-large"
+    }
+} as const;
+
 interface ParticipantTileProps {
     participant: Participant;
     tracks?: TrackReference[];
     mainTrack?: TrackReference;
+    size?: "small" | "medium" | "large";
 }
 
 export const ParticipantTile: React.FC<ParticipantTileProps> = ({
     participant,
     tracks,
+    size = "small",
 }) => {
     const metadata = useParticipantMetadata(participant as RemoteParticipant);
     const isSpeaking = useIsSpeaking(participant);
@@ -47,11 +71,11 @@ export const ParticipantTile: React.FC<ParticipantTileProps> = ({
             <div className="participant-tile-mic-container">
                 {isMuted ? (
                     <div className="participant-tile-mic-icon">
-                        <MicrophoneSlash size={12} color="#525866" />
+                        <MicrophoneSlash size={SIZE_CLASSES[size].iconSize} color="#525866" />
                     </div>
                 ) : (
                     <div className="participant-tile-mic-icon">
-                        <Microphone size={12} color="#525866" />
+                        <Microphone size={SIZE_CLASSES[size].iconSize} color="#525866" />
                     </div>
                 )}
             </div>
@@ -65,7 +89,7 @@ export const ParticipantTile: React.FC<ParticipantTileProps> = ({
                         />
                     </div>
                     <div className="participant-tile-video-overlay" />
-                    <div className="participant-tile-name participant-tile-name-medium participant-tile-name-overlay">
+                    <div className={`participant-tile-name ${SIZE_CLASSES[size].nameText} participant-tile-name-overlay`}>
                         {getDisplayName(metadata!, participant)}
                     </div>
                 </>
@@ -77,16 +101,16 @@ export const ParticipantTile: React.FC<ParticipantTileProps> = ({
                         <img
                             src={metadata.profilePhoto}
                             alt={getDisplayName(metadata, participant)}
-                            className="participant-tile-avatar participant-tile-avatar-medium participant-tile-avatar-border-medium participant-tile-avatar-image"
+                            className={`participant-tile-avatar ${SIZE_CLASSES[size].avatar} participant-tile-avatar-image`}
                         />
                     ) : (
                         <div
-                            className="participant-tile-avatar participant-tile-avatar-medium participant-tile-initials-medium participant-tile-initials-container"
+                            className={`participant-tile-avatar ${SIZE_CLASSES[size].avatar} ${SIZE_CLASSES[size].initialsText} participant-tile-initials-container`}
                         >
                             {getInitials(metadata!, participant)}
                         </div>
                     )}
-                    <div className="participant-tile-name participant-tile-name-medium">
+                    <div className={`participant-tile-name ${SIZE_CLASSES[size].nameText}`}>
                         {getDisplayName(metadata!, participant)}
                     </div>
                 </>
@@ -98,6 +122,7 @@ export const ParticipantTile: React.FC<ParticipantTileProps> = ({
 export const ParticipantTileWide: React.FC<ParticipantTileProps> = ({
     participant,
     mainTrack,
+    size = "large",
 }) => {
     const metadata = useParticipantMetadata(participant as RemoteParticipant);
     const isSpeaking = useIsSpeaking(participant);
@@ -129,8 +154,8 @@ export const ParticipantTileWide: React.FC<ParticipantTileProps> = ({
                         style={{ borderRadius: '0' }}
                     />
                     {!mainTrack && <div className="participant-tile-video-overlay" style={{ borderRadius: '0' }} />}
-                    <div className="participant-tile-name participant-tile-name-medium participant-tile-name-overlay">
-                        {getDisplayName(metadata!, participant)}
+                    <div className={`participant-tile-wide-name`}>
+                        <p className="participant-tile-wide-name-text">{getDisplayName(metadata!, participant)}</p>
                     </div>
                 </>
             )}
@@ -141,17 +166,17 @@ export const ParticipantTileWide: React.FC<ParticipantTileProps> = ({
                         <img
                             src={metadata.profilePhoto}
                             alt={getDisplayName(metadata, participant)}
-                            className="participant-tile-avatar participant-tile-avatar-medium participant-tile-avatar-border-medium participant-tile-avatar-image"
+                            className={`participant-tile-avatar ${SIZE_CLASSES[size].avatar} participant-tile-avatar-image`}
                         />
                     ) : (
                         <div
-                            className="participant-tile-avatar participant-tile-avatar-medium participant-tile-initials-medium participant-tile-initials-container"
+                            className={`participant-tile-avatar ${SIZE_CLASSES[size].avatar} ${SIZE_CLASSES[size].initialsText} participant-tile-initials-container`}
                         >
                             {getInitials(metadata!, participant)}
                         </div>
                     )}
-                    <div className="participant-tile-name participant-tile-name-medium">
-                        {getDisplayName(metadata!, participant)}
+                    <div className={`participant-tile-wide-name`}>
+                        <p className="participant-tile-wide-name-text">{getDisplayName(metadata!, participant)}</p>
                     </div>
                 </>
             )}

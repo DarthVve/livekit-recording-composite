@@ -32,7 +32,7 @@ export const AudioOnlyLayout = ({ tracks }: { tracks: TrackReference[] }) => {
   };
 
   const gridColumns = getOptimalColumns(participantCount);
-  const useFlex = participantCount < 5;
+  const useFlex = participantCount < 4;
 
   return (
     <div
@@ -42,8 +42,8 @@ export const AudioOnlyLayout = ({ tracks }: { tracks: TrackReference[] }) => {
       } as React.CSSProperties}
     >
       {remoteParticipants.map((participant, index) => (
-        <div className='p-tile' key={index}>
-          <ParticipantTile key={participant?.sid} participant={participant} tracks={tracks} />
+        <div className={`${participantCount === 2 ? 'p-tile-two' : participantCount === 3 ? 'p-tile-three' : participantCount === 4 ? 'p-tile-four' : 'p-tile'}`} key={index}>
+          <ParticipantTile key={participant?.sid} participant={participant} tracks={tracks} size={`${participantCount === 2 ? 'large' : participantCount === 3 ? 'medium' : participantCount === 4 ? 'medium' : 'small'}`} />
         </div>
       ))}
     </div>

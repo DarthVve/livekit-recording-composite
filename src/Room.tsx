@@ -18,12 +18,16 @@ export function CompositeTemplate() {
   // determine layout to use
   let main: ReactElement = <></>;
   if (room.state !== ConnectionState.Disconnected) {
-    if (!isAudioOnly && mainTrack) {
+    if (mainTrack) {
       main = <VideoOnlyLayout mainTrack={mainTrack} remainingTracks={remainingTracks!} />
     } else {
       main = (
         <AudioOnlyLayout tracks={remoteVideoTracks} />
       );
+    }
+
+    if (isAudioOnly) {
+      main = <AudioOnlyLayout tracks={remoteVideoTracks} />
     }
   }
 
