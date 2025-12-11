@@ -1,9 +1,10 @@
 import { TrackReference } from '@livekit/components-core';
 import {
+  TrackReferenceOrPlaceholder,
   useParticipants,
   useRoomContext,
 } from '@livekit/components-react';
-import { ParticipantTile } from './ParticipantTile';
+import { ParticipantTile, ParticipantTileWide } from './ParticipantTiles';
 import './Composite.css'
 
 export const AudioOnlyLayout = ({ tracks }: { tracks: TrackReference[] }) => {
@@ -11,7 +12,7 @@ export const AudioOnlyLayout = ({ tracks }: { tracks: TrackReference[] }) => {
   const room = useRoomContext();
   const remoteParticipants = participants.filter(participant => participant.identity !== room?.localParticipant?.identity);
   // console.log('remoteParticipants', remoteParticipants);
-  
+
   // Calculate optimal grid columns based on participant count (max 100)
   const len = remoteParticipants.length;
   const participantCount = Math.min(len, 100);
@@ -19,31 +20,49 @@ export const AudioOnlyLayout = ({ tracks }: { tracks: TrackReference[] }) => {
     if (count === 0) return 1;
     if (count === 1) return 1;
     if (count <= 4) return 2;
-    if (count <= 9) return 3;
-    if (count <= 16) return 4;
-    if (count <= 25) return 5;
-    if (count <= 36) return 6;
-    if (count <= 49) return 7;
-    if (count <= 64) return 8;
-    if (count <= 81) return 9;
-    return 10; // For 82-100 participants
+
+    // For larger counts, use a dynamic formula based on square root
+    // This creates a more balanced grid (closer to square)
+    // For 50: sqrt(50) ≈ 7.07, so we'd get 7-8 columns
+    const sqrt = Math.sqrt(count);
+    const columns = Math.ceil(sqrt);
+
+    // Ensure minimum of 3 columns and maximum of 10 columns
+    return Math.max(3, Math.min(columns, 10));
   };
-  
+
   const gridColumns = getOptimalColumns(participantCount);
-  const useFlex = participantCount < 5;
-  
+  const useFlex = participantCount < 4;
+
   return (
-    <div 
+    <div
       className={`audio-composite ${useFlex ? 'audio-composite-flex' : 'audio-composite-grid'}`}
-      style={{ 
+      style={{
         '--grid-columns': gridColumns
       } as React.CSSProperties}
     >
       {remoteParticipants.map((participant, index) => (
-        <div className='p-tile' key={index}>
-          <ParticipantTile key={participant?.sid} participant={participant} tracks={tracks} />
+        <div className={`${participantCount === 2 ? 'p-tile-two' : participantCount === 3 ? 'p-tile-three' : participantCount === 4 ? 'p-tile-four' : 'p-tile'}`} key={index}>
+          <ParticipantTile key={participant?.sid} participant={participant} tracks={tracks} size={`${participantCount === 2 ? 'large' : participantCount === 3 ? 'medium' : participantCount === 4 ? 'medium' : 'small'}`} />
         </div>
       ))}
+    </div>
+  );
+}
+
+export const VideoOnlyLayout = ({ mainTrack, remainingTracks }: { mainTrack: TrackReferenceOrPlaceholder, remainingTracks: TrackReferenceOrPlaceholder[] }) => {
+  return (
+    <div className='video-composite'>
+      <ParticipantTileWide participant={mainTrack.participant} mainTrack={mainTrack as TrackReference} />
+      <div className='tracks-container'>
+        <div className='remaining-tracks'>
+          {remainingTracks.map((track, index) => (
+            <div className='p-tile' key={index}>
+              <ParticipantTile participant={track.participant} tracks={remainingTracks as TrackReference[]} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
