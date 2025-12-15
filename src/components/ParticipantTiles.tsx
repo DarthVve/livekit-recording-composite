@@ -5,6 +5,20 @@ import { ParticipantMetadata, useParticipantMetadata } from "vg-x07df";
 import { TrackReference } from "@livekit/components-core";
 import './Composite.css';
 
+// Color palette for participant initials backgrounds
+const PARTICIPANT_COLORS = [
+    '#3B82F6', // Blue
+    '#10B981', // Green
+    '#F59E0B', // Amber
+    '#EF4444', // Red
+    '#8B5CF6', // Purple
+    '#EC4899', // Pink
+    '#06B6D4', // Cyan
+    '#F97316', // Orange
+    '#6366F1', // Indigo
+    '#14B8A6', // Teal
+];
+
 // Size-specific classes configuration
 const SIZE_CLASSES = {
     small: {
@@ -43,7 +57,7 @@ export const ParticipantTile: React.FC<ParticipantTileProps> = ({
     const isSpeaking = useIsSpeaking(participant);
     const isMuted = useIsMuted({ participant, source: Track.Source.Microphone });
     const hasVideo = hasVideoTrack(participant);
-    // console.log('participant', participant, metadata);
+
     const participantVideoTrack = tracks?.find(
         track => track?.participant?.sid === participant?.sid
     );
@@ -106,6 +120,7 @@ export const ParticipantTile: React.FC<ParticipantTileProps> = ({
                     ) : (
                         <div
                             className={`participant-tile-avatar ${SIZE_CLASSES[size].avatar} ${SIZE_CLASSES[size].initialsText} participant-tile-initials-container`}
+                            style={{ backgroundColor: getParticipantColor(participant) }}
                         >
                             {getInitials(metadata!, participant)}
                         </div>
@@ -171,6 +186,7 @@ export const ParticipantTileWide: React.FC<ParticipantTileProps> = ({
                     ) : (
                         <div
                             className={`participant-tile-avatar ${SIZE_CLASSES[size].avatar} ${SIZE_CLASSES[size].initialsText} participant-tile-initials-container`}
+                            style={{ backgroundColor: getParticipantColor(participant) }}
                         >
                             {getInitials(metadata!, participant)}
                         </div>
@@ -191,7 +207,6 @@ const getDisplayName = (metadata: ParticipantMetadata, participant: Participant)
     }
 
     const fallbackName = participant?.name || participant?.identity || 'Unknown User';
-    console.log('getDisplayName - metadata:', metadata, 'fallback:', fallbackName);
     return fallbackName;
 };
 
@@ -205,7 +220,6 @@ const getInitials = (metadata: ParticipantMetadata, participant: Participant) =>
             .join("")
             .toUpperCase()
             .slice(0, 2);
-        console.log('getInitials - from metadata:', initials);
         return initials;
     }
 
@@ -216,6 +230,18 @@ const getInitials = (metadata: ParticipantMetadata, participant: Participant) =>
         .join("")
         .toUpperCase()
         .slice(0, 2) || '??';
-    console.log('getInitials - from fallback:', initials);
     return initials;
+};
+
+// Get a consistent color for a participant based on their identity
+const getParticipantColor = (participant: Participant) => {
+    const identifier = participant?.identity || participant?.sid || participant?.name || 'default';
+    // Simple hash function to convert string to number
+    let hash = 0;
+    for (let i = 0; i < identifier.length; i++) {
+        hash = identifier.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    // Use absolute value and modulo to get index
+    const colorIndex = Math.abs(hash) % PARTICIPANT_COLORS.length;
+    return PARTICIPANT_COLORS[colorIndex];
 };
