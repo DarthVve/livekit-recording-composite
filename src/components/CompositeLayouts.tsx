@@ -4,6 +4,7 @@ import {
   useParticipants,
   useRoomContext,
 } from '@livekit/components-react';
+import { useEffect, useState } from 'react';
 import { ParticipantTile, ParticipantTileWide } from './ParticipantTiles';
 import './Composite.css'
 
@@ -51,17 +52,65 @@ export const AudioOnlyLayout = ({ tracks }: { tracks: TrackReference[] }) => {
 }
 
 export const VideoOnlyLayout = ({ mainTrack, remainingTracks }: { mainTrack: TrackReferenceOrPlaceholder, remainingTracks: TrackReferenceOrPlaceholder[] }) => {
+  const PARTICIPANTS_PER_PAGE = 8;
+  const ROTATION_INTERVAL_MS = 5000; // 5 seconds per page
+  
+  const totalParticipants = remainingTracks.length;
+  const hasCarousel = totalParticipants > PARTICIPANTS_PER_PAGE;
+  const totalPages = hasCarousel ? Math.ceil(totalParticipants / PARTICIPANTS_PER_PAGE) : 1;
+  
+  const [currentPage, setCurrentPage] = useState(0);
+  
+  // Auto-rotate carousel when there are more than 8 participants
+  useEffect(() => {
+    if (!hasCarousel) return;
+    
+    const interval = setInterval(() => {
+      setCurrentPage((prevPage) => (prevPage + 1) % totalPages);
+    }, ROTATION_INTERVAL_MS);
+    
+    return () => clearInterval(interval);
+  }, [hasCarousel, totalPages]);
+  
+  // Calculate which participants to display for current page
+  const getDisplayTracks = () => {
+    if (!hasCarousel) {
+      return remainingTracks.slice(0, PARTICIPANTS_PER_PAGE);
+    }
+    
+    const startIndex = currentPage * PARTICIPANTS_PER_PAGE;
+    const endIndex = startIndex + PARTICIPANTS_PER_PAGE;
+    return remainingTracks.slice(startIndex, endIndex);
+  };
+  
+  const displayTracks = getDisplayTracks();
+  const useGrid = remainingTracks.length > 4;
+  
   return (
     <div className='video-composite'>
       <ParticipantTileWide participant={mainTrack.participant} mainTrack={mainTrack as TrackReference} />
       <div className='tracks-container'>
-        <div className='remaining-tracks'>
-          {remainingTracks.map((track, index) => (
-            <div className='p-tile' key={index}>
-              <ParticipantTile participant={track.participant} tracks={remainingTracks as TrackReference[]} />
-            </div>
-          ))}
+        <div className={useGrid ? 'remaining-tracks-grid' : 'remaining-tracks'}>
+          {displayTracks.map((track, index) => {
+            // Use a stable key that includes the page to ensure proper re-rendering
+            const globalIndex = hasCarousel ? currentPage * PARTICIPANTS_PER_PAGE + index : index;
+            return (
+              <div className='p-tile' key={`${track.participant?.sid || globalIndex}-${currentPage}`}>
+                <ParticipantTile participant={track.participant} tracks={remainingTracks as TrackReference[]} />
+              </div>
+            );
+          })}
         </div>
+        {hasCarousel && (
+          <div className='page-indicator'>
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <div
+                key={index}
+                className={`page-indicator-dot ${index === currentPage ? 'page-indicator-dot-active' : ''}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
